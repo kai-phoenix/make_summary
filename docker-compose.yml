@@ -1,25 +1,41 @@
-version: 3;
 services:
   proxy:
-    container_name: proxy
+    container_name: summary_proxy
     build:
       context: .
       dockerfile: ./docker/nginx/Dockerfile
     ports:
-      - "8000:80"
+      - 8000:80
     volumes:
-      - ./docker/nginx/default.conf:/etc/nginx/conf.d/nginx.conf
-      - ./app/:/usr/share/nginx/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./backend:/usr/share/nginx/html
+  app:
+    container_name: summary_app
+    build:
+      context: .
+      dockerfile: ./docker/php/Dockerfile
+    volumes:
+      - ./docker/php/php.ini:/usr/local/php/php.ini
+      - ./backend:/var/www/html
   db:
-    image: mysql:8.2
+    container_name: summary_db
+    build:
+      context: .
+      dockerfile: ./docker/mysql/Dockerfile
+    restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: mydb
+      MYSQL_DATABASE: laravel_db
+      MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_USER: user
       MYSQL_PASSWORD: password
     ports:
-      - "3306:3306"
+      - 3306:3306
+    volumes:
+      - ./docker/mysql/my.cnf:/etc/mysql/my.cnf
+      - db_volume:/var/lib/mysql
   adminer:
     image: adminer
     ports:
       - "8080:8080"
+volumes:
+  db_volume:
