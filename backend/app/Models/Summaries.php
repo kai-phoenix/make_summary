@@ -8,6 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 class Summaries extends Model
 {
     use HasFactory;
+    protected $fillable = [
+        'user_id',
+        'keyword',
+        'summary_text',
+        'api_response',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);
